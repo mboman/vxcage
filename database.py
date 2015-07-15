@@ -42,9 +42,9 @@ class Malware(Base):
     __tablename__ = "malware"
 
     id = Column(Integer(), primary_key=True)
-    file_name = Column(String(255), nullable=True)
-    file_size = Column(Integer(), nullable=False)
-    file_type = Column(Text(), nullable=True)
+    name = Column(String(255), nullable=True)
+    size = Column(Integer(), nullable=False)
+    type = Column(Text(), nullable=True)
     md5 = Column(String(32), nullable=False, index=True)
     crc32 = Column(String(8), nullable=False)
     sha1 = Column(String(40), nullable=False)
@@ -80,19 +80,20 @@ class Malware(Base):
                  sha1,
                  sha256,
                  sha512,
-                 file_size,
-                 file_type=None,
+                 size,
+                 type=None,
                  ssdeep=None,
-                 file_name=None):
+                 name=None):
         self.md5 = md5
         self.sha1 = sha1
         self.crc32 = crc32
         self.sha256 = sha256
         self.sha512 = sha512
-        self.file_size = file_size
-        self.file_type = file_type
+        self.size = size
+        self.type = type
         self.ssdeep = ssdeep
-        self.file_name = file_name
+        self.name = name
+
 
 class Tag(Base):
     __tablename__ = "tag"
@@ -136,7 +137,7 @@ class Database:
     def __del__(self):
         self.engine.dispose()
 
-    def add(self, obj, file_name, tags=None):
+    def add(self, obj, name, tags=None):
         session = self.Session()
 
         if isinstance(obj, File):
@@ -146,10 +147,10 @@ class Database:
                                         sha1=obj.get_sha1(),
                                         sha256=obj.get_sha256(),
                                         sha512=obj.get_sha512(),
-                                        file_size=obj.get_size(),
-                                        file_type=obj.get_type(),
+                                        size=obj.get_size(),
+                                        type=obj.get_type(),
                                         ssdeep=obj.get_ssdeep(),
-                                        file_name=file_name)
+                                        name=name)
                 session.add(malware_entry)
                 session.commit()
             except IntegrityError:

@@ -52,21 +52,21 @@ class File:
         if file_path:
             self.file_data = open(self.file_path, "rb").read()
         else:
-            self.file_data = file_data
+            self.data = data
 
     def get_name(self):
-        file_name = os.path.basename(self.file_path)
-        return file_name
+        name = os.path.basename(self.path)
+        return name
 
     def get_data(self):
-        return self.file_data
+        return self.data
 
     def get_size(self):
         return os.path.getsize(self.file_path)
 
     def get_crc32(self):
         res = ''
-        crc = binascii.crc32(self.file_data)
+        crc = binascii.crc32(self.data)
         for i in range(4):
             t = crc & 0xFF
             crc >>= 8
@@ -74,16 +74,16 @@ class File:
         return res
 
     def get_md5(self):
-        return hashlib.md5(self.file_data).hexdigest()
+        return hashlib.md5(self.data).hexdigest()
 
     def get_sha1(self):
-        return hashlib.sha1(self.file_data).hexdigest()
+        return hashlib.sha1(self.data).hexdigest()
 
     def get_sha256(self):
-        return hashlib.sha256(self.file_data).hexdigest()
+        return hashlib.sha256(self.data).hexdigest()
 
     def get_sha512(self):
-        return hashlib.sha512(self.file_data).hexdigest()
+        return hashlib.sha512(self.data).hexdigest()
 
     def get_ssdeep(self):
         if not HAVE_SSDEEP:
@@ -98,14 +98,14 @@ class File:
         try:
             ms = magic.open(magic.MAGIC_NONE)
             ms.load()
-            file_type = ms.buffer(self.file_data)
+            file_type = ms.buffer(self.data)
         except:
             try:
-                file_type = magic.from_buffer(self.file_data)
+                file_type = magic.from_buffer(self.data)
             except:
                 try:
                     import subprocess
-                    file_process = subprocess.Popen(['file', '-b', self.file_path], stdout = subprocess.PIPE)
+                    file_process = subprocess.Popen(['file', '-b', self.path], stdout = subprocess.PIPE)
                     file_type = file_process.stdout.read().strip()
                 except:
                     return None

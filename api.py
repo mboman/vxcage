@@ -45,9 +45,9 @@ def test():
 def add_malware():
     tags = request.forms.get("tags")
     data = request.files.file
-    info = File(file_path=store_sample(data.file.read()))
+    info = File(path=store_sample(data.file.read()))
 
-    db.add(obj=info, file_name=data.filename, tags=tags)
+    db.add(obj=info, name=data.filename, tags=tags)
 
     return jsonize({"message" : "added"})
 
@@ -72,9 +72,9 @@ def find_malware():
 
         entry = {
             "id" : row.id,
-            "file_name" : row.file_name,
-            "file_type" : row.file_type,
-            "file_size" : row.file_size,
+            "name" : row.name,
+            "type" : row.type,
+            "size" : row.size,
             "md5" : row.md5,
             "sha1" : row.sha1,
             "sha256" : row.sha256,
