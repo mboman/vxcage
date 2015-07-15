@@ -103,7 +103,10 @@ class File:
             return None
 
         try:
-            return pydeep.hash_file(self.path)
+            if Config().api.use_aws:
+                return pydeep.hash_buffer(self.data)
+            else:
+                return pydeep.hash_file(self.path)
         except Exception:
             return None
 
