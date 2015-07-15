@@ -55,7 +55,7 @@ def add_malware():
 def get_malware(sha256):
     path = get_sample_path(sha256)
     if not path:
-        raise HTTPError(404, "File not found")
+        raise HTTPError(404, jsonize({"error": "file_not_found"}))
 
     response.content_length = os.path.getsize(path)
     response.content_type = "application/octet-stream; charset=UTF-8"
