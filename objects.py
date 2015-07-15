@@ -114,15 +114,29 @@ class File:
         try:
             ms = magic.open(magic.MAGIC_NONE)
             ms.load()
-            file_type = ms.buffer(self.data)
+            if not self.path or Config().viper.use_aws:
+                file_type = ms.buffer(self.data)
+            else:
+                file_type = ms.file(self.path)
         except:
             try:
-                file_type = magic.from_buffer(self.data)
+                if not self.path or Config().viper.use_aws:
+                    file_type = magic.from_buffer(self.data)
+                else:
+                    file_type = magic.from_file(self.path)
             except:
                 try:
                     import subprocess
-                    file_process = subprocess.Popen(['file', '-b', self.path], stdout = subprocess.PIPE)
-                    file_type = file_process.stdout.read().strip()
+                    if not self.path or Config().viper.use_aws:
+                        tmp_file_path = tempfile.NamedTemporaryFile(mode='w+b')
+                        tmp_file_path.write(self.data)
+                        tmp_file_path.flush()
+                        file_process = subprocess.Popen(['file', '-b', tmp_file_path], stdout=subprocess.PIPE)
+                        file_type = file_process.stdout.read().strip()
+                        tmp_file_path.close()
+                    else:
+                        file_process = subprocess.Popen(['file', '-b', self.path], stdout = subprocess.PIPE)
+                        file_type = file_process.stdout.read().strip()
                 except:
                     return None
 
