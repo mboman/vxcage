@@ -1,4 +1,4 @@
-# Copyright (c) 2012, Claudio "nex" Guarnieri
+# Copyright (c) 2015, Michael Boman
 #
 # All rights reserved.
 #
@@ -22,23 +22,21 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[api]
+try:
+    from boto.s3.connection import S3Connection
+    from boto.s3.key import Key
+except ImportError as e:
+    print("Error importing boto: %s" % e)
+    exit(1)
 
-# Repository path.
-#
-repository = malware/
+from objects import Config
 
-# Database connection string.
-#
-# Provides database driver name, credentials, host and database name.
-# To get more details about configuration see:
-# http://docs.sqlalchemy.org/en/latest/core/engines.html
-# Example:
-# dialect+driver://username:password@host:port/database
-#
-database = mysql://root:toor@localhost/malware
+class AWSStorage:
+    def __init__(self):
+        s3conn = S3Connection(Config().api.aws_access_key, Config().api.aws_secret_key)
+        s3bucket = s3conn.get_bucket(Config().api.s3bucket)
+        self.s3key = Key(s3bucket)
 
-use_aws = 0
-aws_access_key =
-aws_secret_key =
-s3bucket =
+    def get_key(self):
+        return self.s3key
+

@@ -96,6 +96,9 @@ class VxCage(object):
         elif code == 500:
             print("ERROR: Unexpected error, check your server logs")
             return True
+        elif code == 503:
+            print("ERROR: Sample not available at this time, check again in a few hours")
+            return True
         else:
             return False
 

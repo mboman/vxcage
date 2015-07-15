@@ -27,6 +27,8 @@ import hashlib
 import binascii
 import ConfigParser
 
+from aws import AWSStorage
+
 try:
     import magic
 except ImportError:
@@ -38,6 +40,7 @@ try:
 except ImportError:
     HAVE_SSDEEP = False
 
+
 class Dictionary(dict):
     def __getattr__(self, key):
         return self.get(key, None)
@@ -45,12 +48,19 @@ class Dictionary(dict):
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
-class File:
-    def __init__(self, file_path=None, file_data=None):
-        self.file_path = file_path
 
-        if file_path:
-            self.file_data = open(self.file_path, "rb").read()
+class File:
+    def __init__(self, path=None, data=None):
+        self.path = path
+        self.s3key = None
+
+        if path:
+            if Config().api.use_aws:
+                self.s3key = AWSStorage.get_key()
+                self.s3key.name = self.path
+                self.data = self.s3key.get_contents_as_string()
+            else:
+                self.data = open(self.path, "rb").read()
         else:
             self.data = data
 
@@ -62,7 +72,10 @@ class File:
         return self.data
 
     def get_size(self):
-        return os.path.getsize(self.file_path)
+        if Config().api.use_aws:
+            return self.s3key.size
+        else:
+            return os.path.getsize(self.path)
 
     def get_crc32(self):
         res = ''
@@ -90,7 +103,7 @@ class File:
             return None
 
         try:
-            return pydeep.hash_file(self.file_path)
+            return pydeep.hash_file(self.path)
         except Exception:
             return None
 
@@ -111,6 +124,7 @@ class File:
                     return None
 
         return file_type
+
 
 class Config:
     def __init__(self, cfg="api.conf"):

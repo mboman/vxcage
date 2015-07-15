@@ -26,28 +26,55 @@ import os
 import json
 
 from objects import File, Config
+from aws import AWSStorage
 
 def jsonize(data):
     return json.dumps(data, sort_keys=False, indent=4)
 
 def store_sample(data):
-    sha256 = File(file_data=data).get_sha256()
+    sha256 = File(data=data).get_sha256()
     
     folder = os.path.join(Config().api.repository, sha256[0], sha256[1], sha256[2], sha256[3])
-    if not os.path.exists(folder):
-        os.makedirs(folder, 0750)
+    path = os.path.join(folder, sha256)
 
-    file_path = os.path.join(folder, sha256)
+    if Config().api.use_aws:
+        s3key = AWSStorage().get_key()
+        s3key.name = path
+        if not s3key.exists():
+            s3key.set_contents_from_string(data)
+    else:
+        if not os.path.exists(folder):
+            os.makedirs(folder, 0750)
 
-    if not os.path.exists(file_path):
-        sample = open(file_path, "wb")
-        sample.write(data)
-        sample.close()
+        if not os.path.exists(path):
+            sample = open(path, "wb")
+            sample.write(data)
+            sample.close()
     
-    return file_path
+    return path
 
 def get_sample_path(sha256):
     path = os.path.join(Config().api.repository, sha256[0], sha256[1], sha256[2], sha256[3], sha256)
-    if not os.path.exists(path):
-        return None
+    if Config().api.use_aws:
+        s3key = AWSStorage.get_key()
+        s3key.name = path
+        if not s3key.exists():
+            return None
+    else:
+        if not os.path.exists(path):
+            return None
+
     return path
+
+def get_sample_content(sha256):
+    path = get_sample_path(sha256)
+    if Config().api.use_aws:
+        s3key = AWSStorage.get_key()
+        s3key.name = path
+        if s3key.storage_class == 'GLACIER':
+            s3key.restore(15)
+            return (503, jsonize({'error': 'sample_not_online'}))
+        else:
+            return (200, s3key.get_contents_as_string())
+    else:
+        return open(path, "rb").read()

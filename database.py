@@ -38,6 +38,7 @@ association_table = Table('association', Base.metadata,
     Column('malware_id', Integer, ForeignKey('malware.id'))
 )
 
+
 class Malware(Base):
     __tablename__ = "malware"
 

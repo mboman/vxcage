@@ -25,7 +25,6 @@
 
 # -*- coding: utf-8 -*-
 
-import os
 import argparse
 
 from bottle import route, request, response, run
@@ -33,7 +32,7 @@ from bottle import HTTPError
 
 from objects import File
 from database import Database
-from utils import jsonize, store_sample, get_sample_path
+from utils import jsonize, store_sample, get_sample_path, get_sample_content
 
 db = Database()
 
@@ -57,11 +56,13 @@ def get_malware(sha256):
     if not path:
         raise HTTPError(404, jsonize({"error": "file_not_found"}))
 
-    response.content_length = os.path.getsize(path)
     response.content_type = "application/octet-stream; charset=UTF-8"
-    data = open(path, "rb").read()
-
-    return data
+    code, data = get_sample_content(sha256)
+    response.content_length = len(data)
+    if code == 200:
+        return data
+    else:
+        raise HTTPError(code, data)
 
 @route("/malware/find", method="POST")
 def find_malware():
