@@ -31,6 +31,7 @@ except ImportError as e:
 
 from objects import Config
 
+
 class AWSStorage:
     def __init__(self):
         s3conn = S3Connection(Config().api.aws_access_key, Config().api.aws_secret_key)
@@ -39,4 +40,3 @@ class AWSStorage:
 
     def get_key(self):
         return self.s3key
-
