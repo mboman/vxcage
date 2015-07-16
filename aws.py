@@ -21,13 +21,13 @@
 # ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import sys
 
 try:
     from boto.s3.connection import S3Connection
     from boto.s3.key import Key
 except ImportError as e:
-    print("Error importing boto: %s" % e)
-    exit(1)
+    sys.exit("ERROR: Missing dependency: %s" % e)
 
 from objects import Config
 
