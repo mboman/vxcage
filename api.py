@@ -46,6 +46,18 @@ def add_malware():
     data = request.files.file
     info = File(path=store_sample(data.file.read()))
 
+    if tags:
+        tags = tags.strip()
+        if "," in tags:
+            tags = tags.split(",")
+        else:
+            tags = tags.split(" ")
+        try:
+            tags.append("User:" + request.get('REMOTE_USER'))
+        except Exception as e:
+            tags.append("User:anonymous")
+        tags = ','.join(tags)
+
     db.add(obj=info, name=data.filename, tags=tags)
 
     return jsonize({"message" : "added"})
