@@ -36,6 +36,7 @@ except ImportError:
 
 try:
     import pydeep
+
     HAVE_SSDEEP = True
 except ImportError:
     HAVE_SSDEEP = False
@@ -135,7 +136,7 @@ class File:
                         file_type = file_process.stdout.read().strip()
                         tmp_file_path.close()
                     else:
-                        file_process = subprocess.Popen(['file', '-b', self.path], stdout = subprocess.PIPE)
+                        file_process = subprocess.Popen(['file', '-b', self.path], stdout=subprocess.PIPE)
                         file_type = file_process.stdout.read().strip()
                 except:
                     return None

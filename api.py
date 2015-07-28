@@ -36,9 +36,12 @@ from utils import jsonize, store_sample, get_sample_path, get_sample_content
 
 db = Database()
 
+
 @route("/test", method="GET")
 def test():
-    return jsonize({"message" : "test"})
+    return jsonize({"message": "test"})
+
+
 
 @route("/malware/add", method="POST")
 def add_malware():
@@ -60,7 +63,8 @@ def add_malware():
 
     db.add(obj=info, name=data.filename, tags=tags)
 
-    return jsonize({"message" : "added"})
+    return jsonize({"message": "added"})
+
 
 @route("/malware/get/<sha256>", method="GET")
 def get_malware(sha256):
@@ -76,6 +80,7 @@ def get_malware(sha256):
     else:
         raise HTTPError(code, data)
 
+
 @route("/malware/find", method="POST")
 def find_malware():
     def details(row):
@@ -84,18 +89,18 @@ def find_malware():
             tags.append(tag.tag)
 
         entry = {
-            "id" : row.id,
-            "name" : row.name,
-            "type" : row.type,
-            "size" : row.size,
-            "md5" : row.md5,
-            "sha1" : row.sha1,
-            "sha256" : row.sha256,
-            "sha512" : row.sha512,
-            "crc32" : row.crc32,
+            "id": row.id,
+            "name": row.name,
+            "type": row.type,
+            "size": row.size,
+            "md5": row.md5,
+            "sha1": row.sha1,
+            "sha256": row.sha256,
+            "sha512": row.sha512,
+            "crc32": row.crc32,
             "ssdeep": row.ssdeep,
             "created_at": row.created_at.__str__(),
-            "tags" : tags
+            "tags": tags
         }
 
         return entry
@@ -138,6 +143,7 @@ def find_malware():
 
         return jsonize(results)
 
+
 @route("/tags/list", method="GET")
 def list_tags():
     rows = db.list_tags()
@@ -148,10 +154,13 @@ def list_tags():
 
     return jsonize(results)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-H", "--host", help="Host to bind the API server on", default="localhost", action="store", required=False)
-    parser.add_argument("-p", "--port", help="Port to bind the API server on", default=8080, action="store", required=False)
+    parser.add_argument("-H", "--host", help="Host to bind the API server on", default="localhost", action="store",
+                        required=False)
+    parser.add_argument("-p", "--port", help="Port to bind the API server on", default=8080, action="store",
+                        required=False)
     args = parser.parse_args()
 
     run(host=args.host, port=args.port)

@@ -28,12 +28,14 @@ import json
 from objects import File, Config
 from aws import AWSStorage
 
+
 def jsonize(data):
     return json.dumps(data, sort_keys=False, indent=4)
 
+
 def store_sample(data):
     sha256 = File(data=data).get_sha256()
-    
+
     folder = os.path.join(Config().api.repository, sha256[0], sha256[1], sha256[2], sha256[3])
     path = os.path.join(folder, sha256)
 
@@ -50,8 +52,9 @@ def store_sample(data):
             sample = open(path, "wb")
             sample.write(data)
             sample.close()
-    
+
     return path
+
 
 def get_sample_path(sha256):
     path = os.path.join(Config().api.repository, sha256[0], sha256[1], sha256[2], sha256[3], sha256)
@@ -65,6 +68,7 @@ def get_sample_path(sha256):
             return None
 
     return path
+
 
 def get_sample_content(sha256):
     path = get_sample_path(sha256)

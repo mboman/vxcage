@@ -34,9 +34,9 @@ from datetime import datetime
 Base = declarative_base()
 
 association_table = Table('association', Base.metadata,
-    Column('tag_id', Integer, ForeignKey('tag.id')),
-    Column('malware_id', Integer, ForeignKey('malware.id'))
-)
+                          Column('tag_id', Integer, ForeignKey('tag.id')),
+                          Column('malware_id', Integer, ForeignKey('malware.id'))
+                          )
 
 
 class Malware(Base):
@@ -62,7 +62,7 @@ class Malware(Base):
                             "sha1",
                             "sha256",
                             "sha512",
-                            unique=True), )
+                            unique=True),)
 
     def to_dict(self):
         row_dict = {}
@@ -116,15 +116,17 @@ class Tag(Base):
     def __init__(self, tag):
         self.tag = tag
 
+
 class Singleton(type):
     _instances = {}
+
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
 
-class Database:
 
+class Database:
     __metaclass__ = Singleton
 
     def __init__(self):
@@ -179,7 +181,7 @@ class Database:
                 except IntegrityError as e:
                     session.rollback()
                     try:
-                        malware_entry.tag.append(session.query(Tag).filter(Tag.tag==tag).first())
+                        malware_entry.tag.append(session.query(Tag).filter(Tag.tag == tag).first())
                         session.commit()
                     except SQLAlchemyError:
                         session.rollback()
@@ -198,7 +200,7 @@ class Database:
 
     def find_tag(self, tag):
         session = self.Session()
-        rows =  session.query(Malware).filter(Malware.tag.any(Tag.tag == tag.lower())).all()
+        rows = session.query(Malware).filter(Malware.tag.any(Tag.tag == tag.lower())).all()
         return rows
 
     def find_ssdeep(self, ssdeep):

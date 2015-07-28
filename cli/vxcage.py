@@ -37,14 +37,18 @@ try:
 except ImportError as e:
     sys.exit("ERROR: Missing dependency: %s" % e)
 
+
 def color(text, color_code):
     return '\x1b[%dm%s\x1b[0m' % (color_code, text)
+
 
 def cyan(text):
     return color(text, 36)
 
+
 def bold(text):
     return color(text, 1)
+
 
 def logo():
     print("")
@@ -56,6 +60,7 @@ def logo():
     print(cyan("                             OoO' ") + " by nex")
     print("")
 
+
 def help():
     print("Available commands:")
     print("  " + bold("help") + "        Show this help")
@@ -63,6 +68,7 @@ def help():
     print("  " + bold("find") + "        Find a file by md5, sha256, ssdeep, tag or date")
     print("  " + bold("get") + "         Retrieve a file by sha256")
     print("  " + bold("add") + "         Upload a file to the server")
+
 
 class VxCage(object):
     def __init__(self, host, port, ssl=False, auth=False):
@@ -84,7 +90,7 @@ class VxCage(object):
             self.port = 443
         else:
             url = "http://"
-        
+
         url += "%s:%s%s" % (self.host, self.port, route)
 
         return url
@@ -136,7 +142,7 @@ class VxCage(object):
             print("ERROR: Invalid search term [%s]" % (", ".join(terms)))
             return
 
-        payload = {term : value}
+        payload = {term: value}
         req = requests.post(self.build_url("/malware/find"),
                             data=payload,
                             auth=(self.username, self.password),
@@ -237,7 +243,7 @@ class VxCage(object):
             return
 
         files = {"file": (os.path.basename(path), open(path, "rb"))}
-        payload = {"tags" : tags}
+        payload = {"tags": tags}
 
         req = requests.post(self.build_url("/malware/add"),
                             auth=(self.username, self.password),
@@ -287,14 +293,18 @@ class VxCage(object):
             elif command[0] == "quit" or command[0] == "exit":
                 break
 
+
 if __name__ == "__main__":
     logo()
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-H", "--host", help="Host of VxCage server", default="localhost", action="store", required=False)
+    parser.add_argument("-H", "--host", help="Host of VxCage server", default="localhost", action="store",
+                        required=False)
     parser.add_argument("-p", "--port", help="Port of VxCage server", default=8080, action="store", required=False)
-    parser.add_argument("-s", "--ssl", help="Enable if the server is running over SSL", default=False, action="store_true", required=False)
-    parser.add_argument("-a", "--auth", help="Enable if the server is prompting an HTTP authentication", default=False, action="store_true", required=False)
+    parser.add_argument("-s", "--ssl", help="Enable if the server is running over SSL", default=False,
+                        action="store_true", required=False)
+    parser.add_argument("-a", "--auth", help="Enable if the server is prompting an HTTP authentication", default=False,
+                        action="store_true", required=False)
     args = parser.parse_args()
 
     vx = VxCage(host=args.host, port=args.port, ssl=args.ssl, auth=args.auth)
