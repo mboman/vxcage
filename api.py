@@ -58,7 +58,7 @@ def add_malware():
         try:
             tags.append("User:" + request.get('REMOTE_USER'))
         except Exception as e:
-            tags.append("User:anonymous")
+            pass
         tags = ','.join(tags)
 
     db.add(obj=info, name=data.filename, tags=tags)
